@@ -3,6 +3,7 @@ import CPRDoll from './assets/cpr_doll.png';
 import { makeStyles } from '@material-ui/core/styles';
 import MetricCard from './MetricCard';
 import Game from './Game';
+import Button from '@material-ui/core/Button';
 
 const io = require('socket.io-client');
 const ioClient = io.connect('http://localhost:8000');
@@ -17,10 +18,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+let counter = 0,
+  clearTimer,
+  start,
+  delta;
+
 function CPRPage() {
   const [distance, setDistance] = useState();
   const [force, setForce] = useState(0); // aim for 60 lbf
   const [bpm, setBpm] = useState(0); // aim for 100-120 bpm
+
+  const [time, setTime] = useState(0);
+  const [tempo, setTempo] = useState(0);
+  console.log('time', time);
+  console.log('tempo', tempo);
 
   const transform = (dataMin, dataMax, resultMin, resultMax, dataValue) => {
     return (
@@ -28,58 +39,34 @@ function CPRPage() {
     );
   };
 
-  // useEffect(() => {
-  //   var frequency = function(
-  //     maxFrequency,
-  //     milliseconds,
-  //     updateFrequency,
-  //     callback
-  //   ) {
-  //     var counter = 0,
-  //       clearTimer,
-  //       start,
-  //       delta;
+  const count = function() {
+    clearTimeout(clearTimer);
 
-  //     var count = function() {
-  //       clearTimeout(clearTimer);
+    if (!start) {
+      start = new Date().getTime();
+    } else {
+      delta = new Date().getTime() - start;
+      const newTime = delta / 1000;
+      const newTempo = Math.round((60 * 1000 * counter) / delta);
 
-  //       if (!start) {
-  //         start = new Date().getTime();
-  //       } else {
-  //         delta = new Date().getTime() - start;
-  //         time.innerText = delta / 1000;
-  //         tempo.value = Math.round((60 * 1000 * counter) / delta);
+      setTime(newTime);
+      setTempo(newTempo);
 
-  //         // A sec N times
-  //         // 60 sec X times
-  //         // X = N * 60 / A
-  //       }
-  //       counter++;
+      // A sec N times
+      // 60 sec X times
+      // X = N * 60 / A
+    }
+    counter++;
 
-  //       // Reset counter after 5 seconds
-  //       clearTimer = setTimeout(function() {
-  //         counter = 0;
-  //         delta = 0;
-  //         start = 0;
-  //         time.innerText = '';
-  //         tempo.value = '';
-  //       }, 5000);
-  //     };
-  //   };
-
-  //   frequency(60, 1000, 100, function(
-  //     milliseconds,
-  //     numberOfClicks,
-  //     targetPercentage
-  //   ) {
-  //     // document.getElementById('numberOfMilliseconds').innerHTML = milliseconds;
-  //     console.log('milliseconds', milliseconds);
-  //     // document.getElementById('numberOfClicks').innerHTML = numberOfClicks;
-  //     console.log('numberOfClicks', numberOfClicks);
-  //     // document.getElementById('targetPercentage').innerHTML = targetPercentage;
-  //     console.log('targetPercentage', targetPercentage);
-  //   });
-  // }, []);
+    // Reset counter after 5 seconds
+    clearTimer = setTimeout(function() {
+      counter = 0;
+      delta = 0;
+      start = 0;
+      setTime(0);
+      setTempo(0);
+    }, 2000);
+  };
 
   useEffect(() => {
     ioClient.on('pressDistance', pressDistance => {
@@ -95,6 +82,14 @@ function CPRPage() {
   const classes = useStyles();
   return (
     <div className={classes.root}>
+      <Button
+        size="small"
+        color="primary"
+        variant="contained"
+        onClick={() => count()}
+      >
+        Tap here
+      </Button>
       <div
         style={{
           height: '100%',
@@ -120,7 +115,7 @@ function CPRPage() {
               width: '100%'
             }}
           >
-            <MetricCard title="BPM (Beats per minute)" value="18.5" />
+            <MetricCard title="BPM (Beats per minute)" value={`${tempo}`} />
             <MetricCard title="Force applied (lbs)" value={`${force} lbs`} />
           </div>
           <div
