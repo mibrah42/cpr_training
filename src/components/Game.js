@@ -9,6 +9,7 @@ import catCPR from './assets/catCPR.gif';
 import { Typography } from '@material-ui/core';
 
 function Game(props) {
+  console.log("GAME RENDERED");
   const [start, setStart] = useState(false);
   const [audioStatus, setAudioStatus] = useState('PLAYING');
   const [completed, setCompleted] = useState(false);
