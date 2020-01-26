@@ -5,7 +5,7 @@ import Navbar from './components/Navbar';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import CoursesPage from './components/CoursesPage';
 import CPRPage from './components/CPRPage';
-import { Socket } from './components/Socket';
+// import { Socket } from './components/Socket';
 
 const theme = createMuiTheme({
   palette: {
@@ -28,9 +28,9 @@ function App() {
             <Route exact path="/heart_hero">
               <CPRPage />
             </Route>
-            <Route exact path="/socket">
+            {/* <Route exact path="/socket">
               <Socket />
-            </Route>
+            </Route> */}
           </Switch>
         </Router>
       </div>

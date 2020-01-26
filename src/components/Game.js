@@ -1,4 +1,5 @@
-// import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import Heart from './assets/heart.png';
 
 // function draw() {
 //   ctx.drawImage(bird, bX, bY);
@@ -7,30 +8,28 @@
 // }
 
 // draw();
+const bY = 150;
 
-// function Game(props) {
-//   const cvs = document.getElementById('canvas');
-//   const ctx = cvs.getContext('2d');
+function Game(props) {
+  const canvasRef = useRef(null);
+  if (canvasRef && canvasRef.current) {
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.fillStyle = 'black';
+  }
+  //     function draw(ctx, location) {
+  //     ctx.fillStyle = 'deepskyblue'
+  //     ctx.shadowColor = 'dodgerblue'
+  //     ctx.shadowBlur = 20  ctx.save()
+  //     ctx.scale(SCALE, SCALE)  ctx.translate(location.x / SCALE - OFFSET, location.y / SCALE - OFFSET)
+  //     ctx.fill(HOOK_PATH)
+  //     ctx.restore()
+  //   }
 
-//   let bX = 10;
-//   const bY = 150;
+  return (
+    <div style={{ height: '100%', width: '100%' }}>
+      <canvas ref={canvasRef} width="288" height="512" />
+    </div>
+  );
+}
 
-//   const heart = new Image();
-//   heart.src = './heart.png';
-
-//   useEffect(() => {
-//     const id = setInterval(() => {}, 17);
-
-//     return () => {
-//       clearInterval(id);
-//     };
-//   }, []);
-
-//   return (
-//     <div>
-//       <canvas id="canvas" width="288" height="512" />
-//     </div>
-//   );
-// }
-
-// export default Game;
+export default Game;

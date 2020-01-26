@@ -83,7 +83,7 @@ function CPRPage(props) {
           justifyContent: 'center'
         }}
       >
-        <h1>game</h1>
+        <Game />
       </div>
     </div>
   );
