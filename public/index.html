@@ -34,22 +34,27 @@
   </head>
   <body>
     <script>
+      const INITIAL_PUMP_COUNT = 30;
       const WIDTH = 400;
       const HEIGHT = 512;
 
       let canvas;
 
-      const bY_1 = [350,40];
-      const bY_2 = [150, 250];
+      const bY_1 = [100, 100];
+      const bY_2 = [300, 300];
       let count = 0;
       let bX = -10
      
       const heart = new Image();
       heart.src = 'heart_icon.png';
+      Window.pumpCount = INITIAL_PUMP_COUNT;
 
-      Window.draw = function(ctx) {
+      Window.draw = function(ctx, onComplete) {
           if(ctx == null) return;
           ctx.clearRect(0, 0, WIDTH, HEIGHT);
+          ctx.strokeStyle = '#98CABB';
+          ctx.font = "16px Helvetica";
+          ctx.fillText(`Pump counter: ${Window.pumpCount}`, 0, 30);
           ctx.drawImage(heart, bX, bY_1[count]);
           ctx.drawImage(heart, bX, bY_2[count]);        
           ctx.beginPath();
@@ -71,15 +76,28 @@
           if (bX > WIDTH) {
               bX = -10;
               count = count === 0 ? 1 : 0; 
+              Window.pumpCount -= 1;
           }
-          requestAnimationFrame(() => Window.draw(ctx));
+          if (Window.pumpCount >= 0) {
+            requestAnimationFrame(() => Window.draw(ctx, onComplete));
+          } else {
+            ctx.clearRect(0, 0, WIDTH, HEIGHT);
+            ctx.strokeStyle = '#98CABB';
+            ctx.font = "30px Helvetica";
+            ctx.fillText("Completed!", WIDTH / 2 - 50, HEIGHT / 2);
+            Window.pumpCount = INITIAL_PUMP_COUNT;
+            bX = -10;
+            onComplete();
+          }
       }
 
-      Window.initCanvas = function() {
+      Window.initCanvas = function(onComplete) {
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext('2d');
-        Window.draw(ctx);
+        Window.draw(ctx, onComplete);
+        return ctx;
       }
+
   </script>
       <div id='root'></div>
   </body>

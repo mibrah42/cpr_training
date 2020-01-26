@@ -31,7 +31,7 @@ function CoursesPage(props) {
             title="CPR Training"
             img={Heart}
             disabled={false}
-            route="/heart_hero"
+            route="/cpr_description"
           />
         </Grid>
         <Grid className={classes.courseContainer} item xs={12} md={6} lg={4}>

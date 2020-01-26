@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import CoursesPage from './components/CoursesPage';
 import CPRPage from './components/CPRPage';
+import CourseDescriptionPage from './components/CourseDescriptionPage';
 // import { Socket } from './components/Socket';
 
 const theme = createMuiTheme({
@@ -25,12 +26,12 @@ function App() {
             <Route exact path="/">
               <CoursesPage />
             </Route>
+            <Route exact path="/cpr_description">
+              <CourseDescriptionPage />
+            </Route>
             <Route exact path="/heart_hero">
               <CPRPage />
             </Route>
-            {/* <Route exact path="/socket">
-              <Socket />
-            </Route> */}
           </Switch>
         </Router>
       </div>
