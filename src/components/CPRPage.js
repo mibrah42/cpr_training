@@ -4,6 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import MetricCard from './MetricCard';
 import Game from './Game';
 import Button from '@material-ui/core/Button';
+import { Line } from 'react-chartjs-2';
+import _ from 'lodash';
 
 const io = require('socket.io-client');
 const ioClient = io.connect('http://localhost:8000');
@@ -22,6 +24,39 @@ let counter = 0,
   clearTimer,
   start,
   delta;
+ const target = new Array(300);
+  const data = {
+    datasets: [
+      {
+        label: 'Force over time',
+        fill: false,
+        lineTension: 0.1,
+        backgroundColor: 'rgba(248,50,47,0.4)',
+        borderColor: 'rgba(248,50,47,1)',
+        borderCapStyle: 'butt',
+        borderDash: [],
+        borderDashOffset: 0.0,
+        borderJoinStyle: 'miter',
+        pointBorderColor: 'rgba(248,50,47,1)',
+        pointBackgroundColor: '#fff',
+        pointBorderWidth: 1,
+        pointHoverRadius: 0,
+        pointHoverBackgroundColor: 'rgba(248,50,47,1)',
+        pointHoverBorderColor: 'rgba(220,220,220,1)',
+        pointHoverBorderWidth: 2,
+        pointRadius: 1,
+        pointHitRadius: 1,
+      },
+      // {
+      //   label: 'Target Force',
+      //   borderColor: 'rgba(0,255,0,1)',
+      //   borderWidth: 1,
+      //   fill: false,
+      //   data: target.fill(60)
+        
+      // }
+    ]
+  };
 
 function CPRPage() {
   const [distance, setDistance] = useState();
@@ -30,6 +65,7 @@ function CPRPage() {
   const [thresholdpass,setThresholdpass] = useState(false);
   const [time, setTime] = useState(0);
   const [tempo, setTempo] = useState(0);
+  const [grabData,setGrabData] = useState(data);
   console.log('time', time);
   console.log('tempo', tempo);
 
@@ -62,6 +98,7 @@ function CPRPage() {
       setTempo(0);
     }, 2000);
   };
+
   useEffect(()=>{
     if(!thresholdpass && force> 30){
       setThresholdpass(true);
@@ -71,31 +108,50 @@ function CPRPage() {
       setThresholdpass(false);
     }
   },[force])
+  
   const scale = (num, in_min, in_max, out_min, out_max) => {
     return Math.floor((num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
   }
+
   useEffect(() => {
     ioClient.on('pressDistance', pressDistance => {
-      console.info('pressDistance', pressDistance);
       setForce(
         pressDistance
           ? Math.max(0, scale(pressDistance,620,560 , 0, 80))
           : 0
       );
+      ;
     });
   }, []);
-
+  useEffect(()=>{
+    let id = setInterval(()=>{
+      const newGrabData = _.clone(grabData);
+      const dataLength = newGrabData.datasets[0].data.length;
+      newGrabData.datasets[0].data.unshift(force)
+          const labels = [];
+          for (let i = 0; i < 300; i++) {
+            labels.push(i);
+          }
+        
+          newGrabData.labels = labels;
+          const last5minData = _.take(newGrabData.datasets[0].data,300);
+          newGrabData.datasets[0].data = last5minData;
+         setGrabData(newGrabData)
+      
+    },1);
+    return () => clearInterval(id);
+  },[grabData,force]);
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <Button
+      {/* <Button
         size="small"
         color="primary"
         variant="contained"
         onClick={() => count()}
       >
         Tap here
-      </Button>
+      </Button> */}
       <div
         style={{
           height: '100%',
@@ -122,7 +178,19 @@ function CPRPage() {
             }}
           >
             <MetricCard title="BPM (Beats per minute)" value={`${tempo}`} />
-            <MetricCard title="Force applied (lbs)" value={`${force} lbs`} />
+            <MetricCard title="Force applied (lbf)" value={`${force} lbf`} />
+            <div style={{
+              width:500,
+            }}>
+            <Line data={grabData} options={{scales:{yAxes:[{
+          ticks: {
+              beginAtZero:true,
+              min: 0,
+              max: 80    
+          }
+        }]}}}/>
+
+            </div>
           </div>
           <div
             style={{
@@ -147,6 +215,7 @@ function CPRPage() {
               }}
             >
               <img src={CPRDoll} height={200} />
+              
             </div>
           </div>
         </div>
