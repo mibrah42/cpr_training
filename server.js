@@ -1,38 +1,52 @@
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const firebase = require('firebase');
-const port = new SerialPort('COM3', { baudRate: 115200 });
+const port = new SerialPort('COM5', { baudRate: 115200 });
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
-firebase.initializeApp({
-    apiKey: "AIzaSyAjyJ-T2RiCOJSFBHEDN3kpBQT3wM39XqY",
-    authDomain: "clean-d5b63.firebaseapp.com",
-    databaseURL: "https://clean-d5b63.firebaseio.com",
-    projectId: "clean-d5b63",
-    storageBucket: "clean-d5b63.appspot.com",
-    messagingSenderId: "760378273796",
-    appId: "1:760378273796:web:25c6a75c3fdafbabf98551"
-  });
-  const firestore = firebase.firestore();
-const arrayData = [];  
-const errorLimit = 20;
-// Read the port data
+
+// const arrayData = [];  
+const ERRORLIMIT = 1000;
+// // Read the port data
+
+const
+    io = require("socket.io"),
+    server = io.listen(8000);
+let sequenceNumberByClient = new Map();
 port.on("open", () => {
   console.log('serial port open');
 });
+// event fired every time a new client connects:
+server.on("connection", (socket) => {
+    console.info(`Client connected [id=${socket.id}]`);
+    // initialize this client's sequence number
+    sequenceNumberByClient.set(socket, 1);
+
+    // when socket disconnects, remove it from the list:
+    socket.on("disconnect", () => {
+        sequenceNumberByClient.delete(socket);
+        console.info(`Client gone [id=${socket.id}]`);
+    });
+});
+
 parser.on('data', data =>{
-    if(data< errorLimit){
-        arrayData.unshift(data);
-          console.log('got word from arduino:', data);
-          console.log(' data: ', data);
-          firestore
-          .collection("database")
-          .doc("app")
-          .update({
-            sensor: arrayData
-          });
+  console.log('data', data)
+    if(data < ERRORLIMIT){
+      for (const [client, sequenceNumber] of sequenceNumberByClient.entries()) {
+        client.emit("pressDistance", data);
+        console.log('data', data)
+        sequenceNumberByClient.set(client, sequenceNumber + 1);
+    }
     }else{
         console.log('Error: ',data)
-    }
+    } 
 
 });
+// sends each client its current sequence number
+// setInterval(() => {
+//     let m = parser.read();
+//     console.log('m', m)
+//     for (const [client, sequenceNumber] of sequenceNumberByClient.entries()) {
+//         client.emit("pressDistance", m);
+//         sequenceNumberByClient.set(client, sequenceNumber + 1);
+//     }
+// }, 1000);
