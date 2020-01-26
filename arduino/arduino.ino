@@ -1,8 +1,8 @@
- 
+#define USONIC_DIV 58.0
 int trigPin = 11;    // Trigger
 int echoPin = 12;    // Echo
-long duration, cm;
- 
+long duration, mm;
+
 void setup() {
   //Serial Port begin
   Serial.begin(115200);
@@ -10,18 +10,17 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 }
- 
+
 void loop() {
   digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
   digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
+  delayMicroseconds(11);
   digitalWrite(trigPin, LOW);
   pinMode(echoPin, INPUT);
   duration = pulseIn(echoPin, HIGH);
- 
-  cm = (duration/2) / 29.1;
+  mm = (long) (((float) duration / USONIC_DIV) * 100.0);
 
-  Serial.println(cm);  
-  delay(1000);  
+  Serial.println(mm);
+  delay(100);
 }
