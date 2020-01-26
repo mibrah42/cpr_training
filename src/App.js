@@ -1,23 +1,36 @@
 import React from 'react';
 import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
 import './App.css';
-import Canada311 from './components/Canada311';
-import { Map } from './components/Map';
+import Navbar from './components/Navbar';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import CoursesPage from './components/CoursesPage';
+import CPRPage from './components/CPRPage';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#6373CE'
+    }
+  }
+});
 
 function App() {
   return (
-    <div className="App">
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <Canada311 />
-          </Route>
-          <Route exact path="/map">
-            <Map />
-          </Route>
-        </Switch>
-      </Router>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div className="App">
+        <Navbar />
+        <Router>
+          <Switch>
+            <Route exact path="/">
+              <CoursesPage />
+            </Route>
+            <Route exact path="/heart_hero">
+              <CPRPage />
+            </Route>
+          </Switch>
+        </Router>
+      </div>
+    </ThemeProvider>
   );
 }
 

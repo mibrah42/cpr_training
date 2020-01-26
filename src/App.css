@@ -1,7 +1,8 @@
 .App {
   text-align: center;
-
   font-family: Inter;
+  height: "100%";
+  width: "100%";
 }
 
 .App-logo {
