@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CPRDoll from './assets/cpr_doll.png';
-import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import MetricCard from './MetricCard';
 import Game from './Game';
+import Button from '@material-ui/core/Button';
+
+const io = require('socket.io-client');
+const ioClient = io.connect('http://localhost:8000');
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -15,10 +18,84 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function CPRPage(props) {
+let counter = 0,
+  clearTimer,
+  start,
+  delta;
+
+function CPRPage() {
+  const [distance, setDistance] = useState();
+  const [force, setForce] = useState(0); // aim for 60 lbf
+  const [bpm, setBpm] = useState(0); // aim for 100-120 bpm
+  const [thresholdpass,setThresholdpass] = useState(false);
+  const [time, setTime] = useState(0);
+  const [tempo, setTempo] = useState(0);
+  console.log('time', time);
+  console.log('tempo', tempo);
+
+  
+  const count = function() {
+    clearTimeout(clearTimer);
+    
+    if (!start) {
+      start = new Date().getTime();
+    } else {
+      delta = new Date().getTime() - start;
+      const newTime = delta / 1000;
+      const newTempo = Math.round((60 * 1000 * counter) / delta);
+
+      setTime(newTime);
+      setTempo(newTempo);
+      
+      // A sec N times
+      // 60 sec X times
+      // X = N * 60 / A
+    }
+    counter++;
+
+    // Reset counter after 5 seconds
+    clearTimer = setTimeout(function() {
+      counter = 0;
+      delta = 0;
+      start = 0;
+      setTime(0);
+      setTempo(0);
+    }, 2000);
+  };
+  useEffect(()=>{
+    if(!thresholdpass && force> 30){
+      setThresholdpass(true);
+      count();
+    }
+    if(thresholdpass && force<30){
+      setThresholdpass(false);
+    }
+  },[force])
+  const scale = (num, in_min, in_max, out_min, out_max) => {
+    return Math.floor((num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+  }
+  useEffect(() => {
+    ioClient.on('pressDistance', pressDistance => {
+      console.info('pressDistance', pressDistance);
+      setForce(
+        pressDistance
+          ? Math.max(0, scale(pressDistance,620,560 , 0, 80))
+          : 0
+      );
+    });
+  }, []);
+
   const classes = useStyles();
   return (
     <div className={classes.root}>
+      <Button
+        size="small"
+        color="primary"
+        variant="contained"
+        onClick={() => count()}
+      >
+        Tap here
+      </Button>
       <div
         style={{
           height: '100%',
@@ -44,8 +121,8 @@ function CPRPage(props) {
               width: '100%'
             }}
           >
-            <MetricCard title="BPM (Beats per minute)" value="18.5" />
-            <MetricCard title="Force applied (lbs)" value="90 lbs" />
+            <MetricCard title="BPM (Beats per minute)" value={`${tempo}`} />
+            <MetricCard title="Force applied (lbs)" value={`${force} lbs`} />
           </div>
           <div
             style={{

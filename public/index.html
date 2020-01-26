@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+    <meta charset="utf-8" />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <title>Web site created using create-react-app</title>
+    <title>Life Trainer</title>
 
     <!-- update the version number as needed -->
     <script defer src="/__/firebase/7.7.0/firebase-app.js"></script>
@@ -43,8 +46,8 @@
       const bY_1 = [100, 100];
       const bY_2 = [300, 300];
       let count = 0;
-      let bX = -10
-     
+      let bX = -10;
+
       const heart = new Image();
       heart.src = 'heart_icon.png';
       Window.pumpCount = INITIAL_PUMP_COUNT;
@@ -71,7 +74,14 @@
           }
           ctx.stroke();
 
-          bX += 10;
+        if (bX > WIDTH - 10 - 100) {
+          ctx.strokeStyle = '#98CABB';
+          ctx.font = '50px Helvetica';
+          ctx.fillText('PUSH!', WIDTH / 2 - 50, HEIGHT / 2);
+        } else {
+          ctx.strokeStyle = '#000000';
+        }
+        ctx.stroke();
 
           if (bX > WIDTH) {
               bX = -10;

@@ -4,11 +4,9 @@ import MusicCard from './MusicCard';
 import StayingAliveAlbumImage from './assets/staying_alive.jpg';
 import soundfile from './assets/stayin_alive_audio.mp3';
 import Sound from 'react-sound';
-import CheckGif from './assets/check.gif';
 import HumanCPRGif from './assets/humanCPR.gif';
 import catCPR from './assets/catCPR.gif';
 import { Typography } from '@material-ui/core';
-import useInterval from 'use-interval';
 
 function Game(props) {
   const [start, setStart] = useState(false);
