@@ -79,6 +79,7 @@ function CPRPage(props) {
           height: '100%',
           width: '50%',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center'
         }}

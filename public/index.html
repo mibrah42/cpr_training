@@ -33,7 +33,54 @@
     </style> -->
   </head>
   <body>
-    <div id='root'></div>
-    <script src="./game_logic.js"></script>
+    <script>
+      const WIDTH = 400;
+      const HEIGHT = 512;
+
+      let canvas;
+
+      const bY_1 = [350,40];
+      const bY_2 = [150, 250];
+      let count = 0;
+      let bX = -10
+     
+      const heart = new Image();
+      heart.src = 'heart_icon.png';
+
+      Window.draw = function(ctx) {
+          if(ctx == null) return;
+          ctx.clearRect(0, 0, WIDTH, HEIGHT);
+          ctx.drawImage(heart, bX, bY_1[count]);
+          ctx.drawImage(heart, bX, bY_2[count]);        
+          ctx.beginPath();
+          ctx.moveTo(WIDTH - 10, 0);
+          ctx.lineTo(WIDTH - 10, HEIGHT);
+          ctx.lineWidth = 20;
+          
+          if (bX > WIDTH - 10 - 100) {
+              ctx.strokeStyle = '#98CABB';
+              ctx.font = "50px Helvetica";
+              ctx.fillText("PUSH!", WIDTH / 2 - 50, HEIGHT / 2);
+          } else {
+              ctx.strokeStyle = '#000000';
+          }
+          ctx.stroke();
+
+          bX += 10;
+
+          if (bX > WIDTH) {
+              bX = -10;
+              count = count === 0 ? 1 : 0; 
+          }
+          requestAnimationFrame(() => Window.draw(ctx));
+      }
+
+      Window.initCanvas = function() {
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext('2d');
+        Window.draw(ctx);
+      }
+  </script>
+      <div id='root'></div>
   </body>
 </html>
