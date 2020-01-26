@@ -27,21 +27,16 @@ function CPRPage() {
   const [distance, setDistance] = useState();
   const [force, setForce] = useState(0); // aim for 60 lbf
   const [bpm, setBpm] = useState(0); // aim for 100-120 bpm
-
+  const [thresholdpass,setThresholdpass] = useState(false);
   const [time, setTime] = useState(0);
   const [tempo, setTempo] = useState(0);
   console.log('time', time);
   console.log('tempo', tempo);
 
-  const transform = (dataMin, dataMax, resultMin, resultMax, dataValue) => {
-    return (
-      ((dataValue - dataMin) / (dataValue - dataMax)) * resultMax + resultMin
-    );
-  };
-
+  
   const count = function() {
     clearTimeout(clearTimer);
-
+    
     if (!start) {
       start = new Date().getTime();
     } else {
@@ -51,7 +46,7 @@ function CPRPage() {
 
       setTime(newTime);
       setTempo(newTempo);
-
+      
       // A sec N times
       // 60 sec X times
       // X = N * 60 / A
@@ -67,13 +62,24 @@ function CPRPage() {
       setTempo(0);
     }, 2000);
   };
-
+  useEffect(()=>{
+    if(!thresholdpass && force> 30){
+      setThresholdpass(true);
+      count();
+    }
+    if(thresholdpass && force<30){
+      setThresholdpass(false);
+    }
+  },[force])
+  const scale = (num, in_min, in_max, out_min, out_max) => {
+    return Math.floor((num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+  }
   useEffect(() => {
     ioClient.on('pressDistance', pressDistance => {
       console.info('pressDistance', pressDistance);
       setForce(
         pressDistance
-          ? Math.min(0, transform(550, 700, 0, 80, pressDistance))
+          ? Math.max(0, scale(pressDistance,620,560 , 0, 80))
           : 0
       );
     });
