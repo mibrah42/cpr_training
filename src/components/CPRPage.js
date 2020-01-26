@@ -3,6 +3,7 @@ import CPRDoll from './assets/cpr_doll.png';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import MetricCard from './MetricCard';
+import Game from './Game';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -35,7 +36,17 @@ function CPRPage(props) {
             flexDirection: 'column'
           }}
         >
-          <MetricCard />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%'
+            }}
+          >
+            <MetricCard title="BPM (Beats per minute)" value="18.5" />
+            <MetricCard title="Force applied (lbs)" value="90 lbs" />
+          </div>
           <div
             style={{
               width: 500,

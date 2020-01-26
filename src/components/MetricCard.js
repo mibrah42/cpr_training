@@ -14,7 +14,9 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16
+    marginBottom: 16,
+    marginLeft: 10,
+    marginRight: 10
   },
   bullet: {
     display: 'inline-block',
@@ -29,17 +31,17 @@ const useStyles = makeStyles({
   }
 });
 
-export default function MetricCard(props) {
+export default function MetricCard({ title, value }) {
   const classes = useStyles();
   const bull = <span className={classes.bullet}>•</span>;
 
   return (
     <Card className={classes.card}>
       <Typography className={classes.title} color="textSecondary" gutterBottom>
-        BPM (Beats per minute)
+        {title}
       </Typography>
       <Typography variant="h5" component="h2">
-        18.5
+        {value}
       </Typography>
     </Card>
   );
