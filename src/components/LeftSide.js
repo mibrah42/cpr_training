@@ -4,15 +4,13 @@ import { Line } from 'react-chartjs-2';
 import CPRDoll from './assets/cpr_doll.png';
 import _ from 'lodash';
 
-
-
 const io = require('socket.io-client');
 const ioClient = io.connect('http://localhost:8000');
 
 let counter = 0,
-clearTimer,
-start,
-delta;
+  clearTimer,
+  start,
+  delta;
 const target = new Array(300);
 const data = {
   datasets: [
@@ -34,103 +32,101 @@ const data = {
       pointHoverBorderColor: 'rgba(220,220,220,1)',
       pointHoverBorderWidth: 2,
       pointRadius: 1,
-      pointHitRadius: 1,
-    },
+      pointHitRadius: 1
+    }
     // {
     //   label: 'Target Force',
     //   borderColor: 'rgba(0,255,0,1)',
     //   borderWidth: 1,
     //   fill: false,
     //   data: target.fill(60)
-      
+
     // }
   ]
 };
 function LeftSide() {
-    const [distance, setDistance] = useState();
-    const [force, setForce] = useState(0); // aim for 60 lbf
-    const [bpm, setBpm] = useState(0); // aim for 100-120 bpm
-    const [thresholdpass,setThresholdpass] = useState(false);
-    const [time, setTime] = useState(0);
-    const [tempo, setTempo] = useState(0);
-    const [grabData,setGrabData] = useState(data);
-    console.log('time', time);
-    console.log('tempo', tempo);
-  
-    
-    const count = function() {
-      clearTimeout(clearTimer);
-      
-      if (!start) {
-        start = new Date().getTime();
-      } else {
-        delta = new Date().getTime() - start;
-        const newTime = delta / 1000;
-        const newTempo = Math.round((60 * 1000 * counter) / delta);
-  
-        setTime(newTime);
-        setTempo(newTempo);
-        
-        // A sec N times
-        // 60 sec X times
-        // X = N * 60 / A
-      }
-      counter++;
-  
-      // Reset counter after 5 seconds
-      clearTimer = setTimeout(function() {
-        counter = 0;
-        delta = 0;
-        start = 0;
-        setTime(0);
-        setTempo(0);
-      }, 2000);
-    };
-  
-    useEffect(()=>{
-      if(!thresholdpass && force> 30){
-        setThresholdpass(true);
-        count();
-      }
-      if(thresholdpass && force<30){
-        setThresholdpass(false);
-      }
-    },[force])
-    
-    const scale = (num, in_min, in_max, out_min, out_max) => {
-      return Math.floor((num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
-    }
-  
-    useEffect(() => {
-      ioClient.on('pressDistance', pressDistance => {
-        setForce(
-          pressDistance
-            ? Math.max(0, scale(pressDistance,620,560 , 0, 80))
-            : 0
-        );
-      });
-    }, []);
-    useEffect(()=>{
-      let id = setInterval(()=>{
-        const newGrabData = _.clone(grabData);
-        const dataLength = newGrabData.datasets[0].data.length;
-        newGrabData.datasets[0].data.unshift(force)
-            const labels = [];
-            for (let i = 0; i < 300; i++) {
-              labels.push(i);
-            }
-          
-            newGrabData.labels = labels;
-            const last5minData = _.take(newGrabData.datasets[0].data,300);
-            newGrabData.datasets[0].data = last5minData;
-           setGrabData(newGrabData)
-        
-      },1);
-      return () => clearInterval(id);
-    },[grabData,force]);
+  const [distance, setDistance] = useState();
+  const [force, setForce] = useState(0); // aim for 60 lbf
+  const [bpm, setBpm] = useState(0); // aim for 100-120 bpm
+  const [thresholdpass, setThresholdpass] = useState(false);
+  const [time, setTime] = useState(0);
+  const [tempo, setTempo] = useState(0);
+  const [grabData, setGrabData] = useState(data);
+  console.log('time', time);
+  console.log('tempo', tempo);
 
-    return(
-      <div 
+  const count = function() {
+    clearTimeout(clearTimer);
+
+    if (!start) {
+      start = new Date().getTime();
+    } else {
+      delta = new Date().getTime() - start;
+      const newTime = delta / 1000;
+      const newTempo = Math.round((60 * 1000 * counter) / delta);
+
+      setTime(newTime);
+      setTempo(newTempo);
+
+      // A sec N times
+      // 60 sec X times
+      // X = N * 60 / A
+    }
+    counter++;
+
+    // Reset counter after 5 seconds
+    clearTimer = setTimeout(function() {
+      counter = 0;
+      delta = 0;
+      start = 0;
+      setTime(0);
+      setTempo(0);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (!thresholdpass && force > 30) {
+      setThresholdpass(true);
+      count();
+    }
+    if (thresholdpass && force < 30) {
+      setThresholdpass(false);
+    }
+  }, [force]);
+
+  const scale = (num, in_min, in_max, out_min, out_max) => {
+    return Math.floor(
+      ((num - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min
+    );
+  };
+
+  useEffect(() => {
+    ioClient.on('pressDistance', pressDistance => {
+      setForce(
+        pressDistance ? Math.max(0, scale(pressDistance, 620, 560, 0, 80)) : 0
+      );
+    });
+  }, []);
+  useEffect(() => {
+    let id = setInterval(() => {
+      const newGrabData = _.clone(grabData);
+      const dataLength = newGrabData.datasets[0].data.length;
+      newGrabData.datasets[0].data.unshift(force);
+      const labels = [];
+      for (let i = 0; i < 300; i++) {
+        labels.push(i);
+      }
+
+      newGrabData.labels = labels;
+      const last5minData = _.take(newGrabData.datasets[0].data, 300);
+      newGrabData.datasets[0].data = last5minData;
+      setGrabData(newGrabData);
+    }, 1);
+    return () => clearInterval(id);
+  }, [grabData, force]);
+
+  return (
+    <div
       style={{
         height: '100%',
         width: '60%',
@@ -155,19 +151,39 @@ function LeftSide() {
             width: '100%'
           }}
         >
-          <MetricCard title="BPM (Beats per minute)" value={`${tempo}`} />
-          <MetricCard title="Force applied (lbf)" value={`${force} lbf`} />
-          <div style={{
-            width:500,
-          }}>
-          <Line data={grabData} options={{scales:{yAxes:[{
-        ticks: {
-            beginAtZero:true,
-            min: 0,
-            max: 80    
-        }
-      }]}}}/>
-
+          <MetricCard
+            title="BPM (Beats per minute)"
+            value={`${tempo}`}
+            targetValue={110}
+            valueNumber={_.toNumber(tempo)}
+          />
+          <MetricCard
+            title="Force applied (lbf)"
+            value={`${force} lbf`}
+            targetValue={60}
+            valueNumber={_.toNumber(force)}
+          />
+          <div
+            style={{
+              width: 500
+            }}
+          >
+            <Line
+              data={grabData}
+              options={{
+                scales: {
+                  yAxes: [
+                    {
+                      ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 80
+                      }
+                    }
+                  ]
+                }
+              }}
+            />
           </div>
         </div>
         <div
@@ -193,12 +209,10 @@ function LeftSide() {
             }}
           >
             <img src={CPRDoll} height={200} />
-            
           </div>
         </div>
       </div>
     </div>
-
-    );
-};
+  );
+}
 export default LeftSide;

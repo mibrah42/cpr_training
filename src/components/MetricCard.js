@@ -5,6 +5,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Styled from 'styled-components';
 
 const useStyles = makeStyles({
   card: {
@@ -31,18 +32,29 @@ const useStyles = makeStyles({
   }
 });
 
-export default function MetricCard({ title, value }) {
+export default function MetricCard({ title, value, targetValue, valueNumber }) {
   const classes = useStyles();
   const bull = <span className={classes.bullet}>•</span>;
+
+  const color =
+    valueNumber < targetValue + 10 && valueNumber > targetValue - 10
+      ? '#00FF00'
+      : 'black';
 
   return (
     <Card className={classes.card}>
       <Typography className={classes.title} color="textSecondary" gutterBottom>
         {title}
       </Typography>
-      <Typography variant="h5" component="h2">
+      <StyledText variant="h5" component="h2" textColor={color}>
         {value}
-      </Typography>
+      </StyledText>
     </Card>
   );
 }
+
+const StyledText = Styled(Typography)`
+  &&{
+    color: ${props => props.textColor}
+  }
+`;
