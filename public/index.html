@@ -37,7 +37,6 @@
   </head>
   <body>
     <script>
-      const INITIAL_PUMP_COUNT = 30;
       const WIDTH = 400;
       const HEIGHT = 512;
 
@@ -50,7 +49,7 @@
 
       const heart = new Image();
       heart.src = 'heart_icon.png';
-      Window.pumpCount = INITIAL_PUMP_COUNT;
+      Window.pumpCount = 30;
 
       Window.draw = function(ctx, onComplete) {
           if(ctx == null) return;
@@ -89,14 +88,13 @@
               Window.pumpCount -= 1;
           }
           if (Window.pumpCount >= 0) {
+            bX += 10;
             requestAnimationFrame(() => Window.draw(ctx, onComplete));
           } else {
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
             ctx.strokeStyle = '#98CABB';
             ctx.font = "30px Helvetica";
             ctx.fillText("Completed!", WIDTH / 2 - 50, HEIGHT / 2);
-            Window.pumpCount = INITIAL_PUMP_COUNT;
-            bX = -10;
             onComplete();
           }
       }
@@ -105,10 +103,9 @@
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext('2d');
         Window.draw(ctx, onComplete);
-        return ctx;
       }
 
   </script>
-      <div id='root'></div>
+  <div id='root'></div>
   </body>
 </html>

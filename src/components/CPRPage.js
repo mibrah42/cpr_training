@@ -28,7 +28,7 @@ function CPRPage() {
       <div
         style={{
           height: '100%',
-          width: '50%',
+          width: '40%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',

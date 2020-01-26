@@ -133,7 +133,7 @@ function LeftSide() {
       <div 
       style={{
         height: '100%',
-        width: '50%',
+        width: '60%',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'

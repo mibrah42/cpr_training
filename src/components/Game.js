@@ -13,7 +13,6 @@ function Game(props) {
   const [start, setStart] = useState(false);
   const [audioStatus, setAudioStatus] = useState('PLAYING');
   const [completed, setCompleted] = useState(false);
-  const [ctx, setContext] = useState(null);
   const [displayCountDown, setDisplayCountDown] = useState(false);
   const [countDown, setCountDown] = useState(3);
 
@@ -25,12 +24,7 @@ function Game(props) {
   };
 
   const initCanvas = () => {
-    if (ctx != null) {
-      Window.draw(ctx, handleOnComplete);
-      return;
-    }
-    const context = Window.initCanvas(handleOnComplete);
-    setContext(context);
+    Window.initCanvas(handleOnComplete);
     setStart(true);
   };
 
